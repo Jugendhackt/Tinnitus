@@ -1,16 +1,16 @@
 package org.jugendhackt.tinnitus.util;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Cache {
 
 	private static Cache instance = null;
 	
-	private ArrayList<Tuple<String, Integer>> cache;
+	private CopyOnWriteArrayList<Tuple<String, Integer>> cache;
 
 	private Cache() {
-		this.cache = new ArrayList<Tuple<String, Integer>>();
+		this.cache = new CopyOnWriteArrayList<Tuple<String, Integer>>();
 	}
 	
 	public static Cache getInstance() {

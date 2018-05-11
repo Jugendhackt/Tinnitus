@@ -13,10 +13,10 @@ public class TinnitusServer {
 
     public TinnitusServer() {
         config = new ResourceConfig()
-                .packages("org.jugenhackt.tinnitus.rest.server.resources");
+                .packages("org.jugendhackt.tinnitus.rest.server.resources");
 
         this.srv = JettyHttpContainerFactory
-                .createServer(URI.create("/tinnitus"), this.config);
+                .createServer(URI.create("http://localhost:8081"), this.config);
     }
     
     public void start() {

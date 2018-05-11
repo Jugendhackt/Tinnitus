@@ -5,15 +5,15 @@ import java.util.Collections;
 
 public class Cache {
 
-	private Cache instance = null;
+	private static Cache instance = null;
 	
-	private ArrayList<Tuple<String, Long>> cache;
+	private ArrayList<Tuple<String, Integer>> cache;
 
 	private Cache() {
-		this.cache = new ArrayList<Tuple<String, Long>>();
+		this.cache = new ArrayList<Tuple<String, Integer>>();
 	}
 	
-	public Cache getInstance() {
+	public static Cache getInstance() {
 		if(instance != null) {
 			return instance;
 		} else {
@@ -21,13 +21,17 @@ public class Cache {
 		}
 	}
 	
-	public Tuple<String, Long> getNextElement() {
-		Tuple<String, Long> res = this.cache.get(0);
+	public Tuple<String, Integer> getNextElement() {
+		Tuple<String, Integer> res = this.cache.get(0);
 		this.cache.remove(0);
 		
 		Collections.rotate(cache, -1);
 		
 		return res;
+	}
+	
+	public void addElement(Tuple<String, Integer> data) {
+	    this.cache.add(data);
 	}
 	
 }

@@ -7,10 +7,10 @@ public class Cache {
 
 	private static Cache instance = null;
 	
-	private CopyOnWriteArrayList<Tuple<String, Integer>> cache;
+	private CopyOnWriteArrayList<DataSet<String, Integer>> cache;
 
 	private Cache() {
-		this.cache = new CopyOnWriteArrayList<Tuple<String, Integer>>();
+		this.cache = new CopyOnWriteArrayList<DataSet<String, Integer>>();
 	}
 	
 	public static Cache getInstance() {
@@ -21,8 +21,8 @@ public class Cache {
 		}
 	}
 	
-	public Tuple<String, Integer> getNextElement() {
-		Tuple<String, Integer> res = this.cache.get(0);
+	public DataSet<String, Integer> getNextElement() {
+	    DataSet<String, Integer> res = this.cache.get(0);
 		this.cache.remove(0);
 		
 		Collections.rotate(cache, -1);
@@ -30,7 +30,7 @@ public class Cache {
 		return res;
 	}
 	
-	public void addElement(Tuple<String, Integer> data) {
+	public void addElement(DataSet<String, Integer> data) {
 	    this.cache.add(data);
 	}
 	

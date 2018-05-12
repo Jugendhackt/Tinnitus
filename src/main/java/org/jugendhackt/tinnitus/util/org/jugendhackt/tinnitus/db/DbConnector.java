@@ -14,7 +14,7 @@ public class DbConnector {
         logger.info("Starting to connect to DB");
     }
 
-    public startConnection(){
+    public void startConnection(){
 
     }
 }

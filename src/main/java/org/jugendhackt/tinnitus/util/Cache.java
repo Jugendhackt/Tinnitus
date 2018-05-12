@@ -25,13 +25,17 @@ public class Cache {
 	}
 	
 	public DataSet<String, Integer> getNextElement() {
-	    DataSet<String, Integer> res = this.cache.get(0);
-
-		this.cache.remove(0);
-
-		Collections.rotate(cache, -1);
-
-		return res;
+	    if(this.cache.size() > 0) {
+    	    DataSet<String, Integer> res = this.cache.get(0);
+    
+    		this.cache.remove(0);
+    
+    		Collections.rotate(cache, -1);
+    
+    		return res;
+	    } else {
+	        return null;
+	    }
 	}
 	
 	public void addElement(DataSet<String, Integer> data) {

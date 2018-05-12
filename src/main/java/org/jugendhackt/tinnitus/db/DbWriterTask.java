@@ -22,11 +22,17 @@ public class DbWriterTask implements Runnable {
     }
 
     @Override
-    public void run() {        
+    public void run() { 
         DataSet<String, Integer> ds = Cache.getInstance().getNextElement();
+        
+        if(ds == null) {
+            return;
+        }
+        
         Tuple<String, Integer> tuple = ds.getData();
         
         Point p = Point.measurement("noise" + ds.getMpId())
+                // TODO use timestamp/dateformat
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("value", tuple.getValue())
                 .build();

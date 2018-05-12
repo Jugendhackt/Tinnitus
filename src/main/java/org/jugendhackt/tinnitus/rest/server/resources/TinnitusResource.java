@@ -15,8 +15,6 @@ public class TinnitusResource {
     @POST
     public String recvData(@FormParam("mpid") String mpid,
             @FormParam("time") String time, @FormParam("data") String data) {
-        System.out.println("Time: " + time + " Data: " + data);
-
         Cache.getInstance()
                 .addElement(new DataSet<String, Integer>(Integer.valueOf(mpid),
                         new Tuple<String, Integer>(time,

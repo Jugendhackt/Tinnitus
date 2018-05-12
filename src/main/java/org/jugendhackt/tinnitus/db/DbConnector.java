@@ -1,13 +1,11 @@
 package org.jugendhackt.tinnitus.db;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
-import org.influxdb.dto.Point;
-import org.jugendhackt.tinnitus.util.Cache;
-import org.jugendhackt.tinnitus.util.DataSet;
-import org.jugendhackt.tinnitus.util.Tuple;
 
 /**
  * @author Flawn
@@ -19,12 +17,14 @@ public class DbConnector {
     private String password;
     private InfluxDB db;
 
-    public DbConnector(String host, String port){
-        logger.info("Starting to connect to DB");
+    public DbConnector(String host, String username, String password){
+        this.host = host;
+        this.username = username;
+        this.password = password;
     }
 
     public void startConnection(){
-
+        logger.info("Starting to connect to DB");
         try{
             db = InfluxDBFactory.connect(host, username, password);
             db.setDatabase("Tinnitus");
@@ -33,16 +33,8 @@ public class DbConnector {
             logger.severe(e.getMessage());
         }
         logger.info("Connection is established!");
-
-    }
-    public void writeToDb(Tuple t){
-        DataSet<String, Integer> ds = Cache.getInstance().getNextElement();
-        Tuple<String, Integer> tuple = ds.getData();
-        db.write(Point.measurement("noise")
-                .time(Long.valueOf(tuple.getKey()), TimeUnit.MILLISECONDS)
-                .addField("db", tuple.getKey())
-                .tag("geolocation", String.valueOf(ds.getMpId()))
-                .build());
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(new DbWriterTask(db), 0 , 10, TimeUnit.SECONDS);
     }
 
 }

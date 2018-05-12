@@ -13,16 +13,17 @@ import org.jugendhackt.tinnitus.util.Tuple;
 public class DbWriterTask implements Runnable {
     private InfluxDB db;
 
-    public DbWriterTask(InfluxDB db){
+    public DbWriterTask(InfluxDB db) {
         this.db = db;
     }
-    @Override public void run() {
+
+    @Override
+    public void run() {
         DataSet<String, Integer> ds = Cache.getInstance().getNextElement();
         Tuple<String, Integer> tuple = ds.getData();
-        db.write(Point.measurement("noise")
+        db.write(Point.measurement("noise" + String.valueOf(ds.getMpId()))
                 .time(Long.valueOf(tuple.getKey()), TimeUnit.MILLISECONDS)
-                .addField("db", tuple.getKey())
-                .tag("geolocation", String.valueOf(ds.getMpId()))
+                .addField("db", tuple.getValue())
                 .build());
     }
 }

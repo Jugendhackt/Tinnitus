@@ -1,16 +1,17 @@
 package org.jugendhackt.tinnitus.util;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Cache {
 
 	private static Cache instance = null;
 	
-	private CopyOnWriteArrayList<DataSet<String, Integer>> cache;
+	private List<DataSet<String, Integer>> cache;
 
 	private Cache() {
-		this.cache = new CopyOnWriteArrayList<DataSet<String, Integer>>();
+		this.cache = Collections.synchronizedList(new ArrayList<DataSet<String, Integer>>());
 	}
 	
 	public static Cache getInstance() {
@@ -19,9 +20,10 @@ public class Cache {
 		} else {
 			return new Cache();
 		}
+		
 	}
 	
-	public DataSet<String, Integer> getNextElement() {
+	public synchronized DataSet<String, Integer> getNextElement() {
 	    DataSet<String, Integer> res = this.cache.get(0);
 		this.cache.remove(0);
 		
@@ -30,7 +32,7 @@ public class Cache {
 		return res;
 	}
 	
-	public void addElement(DataSet<String, Integer> data) {
+	public synchronized void addElement(DataSet<String, Integer> data) {
 	    this.cache.add(data);
 	}
 	

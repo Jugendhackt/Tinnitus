@@ -29,14 +29,14 @@ public class DbConnector implements Callable<Void> {
         logger.info("Starting to connect to DB");
         try{
             db = InfluxDBFactory.connect(host, username, password);
-            db.setDatabase("Tinnitus");
+            db.setDatabase("tinnitus");
         } catch(Exception e){
             logger.info("Connection couldn't be established!");
             logger.severe(e.getMessage());
         }
         logger.info("Connection is established!");
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(new DbWriterTask(db), 1 , 10, TimeUnit.SECONDS);
+        service.scheduleAtFixedRate(new DbWriterTask(db), 0, 10, TimeUnit.SECONDS);
         
         return null;
     }

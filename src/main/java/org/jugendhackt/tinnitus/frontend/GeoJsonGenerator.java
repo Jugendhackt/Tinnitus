@@ -1,5 +1,8 @@
 package org.jugendhackt.tinnitus.frontend;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,13 +29,11 @@ public class GeoJsonGenerator {
         this.db = InfluxDBFactory.connect(host, username, password);
         this.db.setDatabase("tinnitus");
 
-        HashMap<String, Double> ultimateResult = getAverages();
-        
-        
+        HashMap<String, Double> ultimateResult = getAverages(startTime, endTime);
 
     }
 
-    private HashMap<String, Double> getAverages() {
+    private HashMap<String, Double> getAverages(int startTime, int endTime) {
         String queryString = "SELECT * from name WHERE time > now() - 2w";
 
         ArrayList<String> meas = (ArrayList<String>) queryMeasurements();
@@ -43,10 +44,6 @@ public class GeoJsonGenerator {
                     .replaceAll("\\[", "")
                     .replaceAll("\\]", "")), "tinnitus");
             // List<QueryResult.Result> results = db.query(q).getResults();
-
-            System.out.println(queryString.replaceAll("name", meas.get(i)
-                    .replaceAll("\\[", "")
-                    .replaceAll("\\]", "")));
 
             QueryResult points = db.query(q);
 
@@ -68,6 +65,12 @@ public class GeoJsonGenerator {
 
             // Loop over row
             for (int j = 0; j < data.size(); j++) {
+                String str = data.get(j).get(0).toString();
+                str = str.replaceAll("T", " ").replaceAll("Z", "");
+                System.out.println(str);
+                int hour = Integer.parseInt(str.split(" ")[1].split(":")[0]);
+                
+                if(hour >= startTime && hour <= endTime)
                 sum += Double.valueOf(data.get(j)
                         .get(1)
                         .toString());

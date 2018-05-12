@@ -19,11 +19,15 @@ public class DbWriterTask implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("1");
         DataSet<String, Integer> ds = Cache.getInstance().getNextElement();
         Tuple<String, Integer> tuple = ds.getData();
-        db.write(Point.measurement("noise" + String.valueOf(ds.getMpId()))
-                .time(Long.valueOf(tuple.getKey()), TimeUnit.MILLISECONDS)
-                .addField("db", tuple.getValue())
-                .build());
+        Point p = Point.measurement("noise" + String.valueOf(ds.getMpId()))
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .addField("value", tuple.getValue())
+                .build();
+        db.write(p);
+        System.out.println("fertig");
+
     }
 }

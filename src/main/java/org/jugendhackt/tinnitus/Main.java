@@ -60,7 +60,7 @@ public class Main {
         for (int i = 0; i < 100; i++) {
             Cache.getInstance()
                     .addElement(new DataSet<String, Integer>(0,
-                            new Tuple("21:" + i % 60, i * i - 2)));
+                            new Tuple("21" + i % 60, i * i + 2)));
         }
 
         System.out.println("Populated cache");

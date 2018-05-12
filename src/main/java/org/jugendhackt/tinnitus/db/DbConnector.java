@@ -36,7 +36,7 @@ public class DbConnector implements Callable<Void> {
         }
         logger.info("Connection is established!");
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(new DbWriterTask(db), 0 , 10, TimeUnit.SECONDS);
+        service.scheduleAtFixedRate(new DbWriterTask(db), 1 , 10, TimeUnit.SECONDS);
         
         return null;
     }

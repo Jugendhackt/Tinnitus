@@ -51,17 +51,14 @@ public class GeoJsonGenerator {
         for (String name : ultimateResult.keySet()) {
             name = name.replaceAll("\\[", "");
             name = name.replaceAll("\\]", "");
-            System.out.println(name);
             int id = Integer.parseInt(
                     new Character(name.charAt(name.length() - 1)).toString());
 
             String lng = getLongitude(id);
             String lat = getLatitude(id);
-            
-            System.out.println("Long=" + lng + " Lat=" + lat);
 
             Point point = new Point();
-            point.setVol(Double.toString(ultimateResult.get(name)));
+            point.setVol(String.valueOf(ultimateResult.get(name)));
             point.setLng(lng);
             point.setLat(lat);
 
@@ -161,7 +158,9 @@ public class GeoJsonGenerator {
                             .toString());
             }
 
-            ultimateResult.put(meas.get(i), sum / data.size());
+            ultimateResult.put(meas.get(i)
+                    .replaceAll("\\[", "")
+                    .replaceAll("\\]", ""), sum / data.size());
         }
 
         return ultimateResult;

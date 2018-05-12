@@ -27,7 +27,7 @@ public class Main {
     private static Properties props;
 
     public static void main(String[] args) {
-         mockCache();
+//         mockCache();
 
         System.out.println(Paths.get("influx-creds.properties")
                 .toAbsolutePath());

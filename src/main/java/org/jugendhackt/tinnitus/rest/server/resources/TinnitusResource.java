@@ -20,7 +20,7 @@ import org.jugendhackt.tinnitus.util.Cache;
 import org.jugendhackt.tinnitus.util.DataSet;
 import org.jugendhackt.tinnitus.util.JsonUtil;
 import org.jugendhackt.tinnitus.util.TimeUtils;
-import org.jugendhackt.tinnitus.util.Tuple;
+import org.jugendhackt.tinnitus.util.Triple;
 
 @Path("/nw")
 public class TinnitusResource {
@@ -32,14 +32,22 @@ public class TinnitusResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void recvData(@FormParam("mpid") String mpid,
-            @FormParam("time") String time, @FormParam("data") String data) {
+            @FormParam("time") String time, @FormParam("noise") String noise, @FormParam("dust") String dust) {
+        
+        log.info("Received: MPID=" + mpid + " TIME=" + time + " DUST=" + dust + " NOISE=" + noise);
 
-        log.info("Received: MPID=" + mpid + " TIME=" + time + " DATA=" + data);
-
+        if(noise == null) {
+            noise = "0";
+        }
+        
+        if(dust == null) {
+            dust = "0";
+        }
+        
         Cache.getInstance()
-                .addElement(new DataSet<String, Integer>(Integer.valueOf(mpid),
-                        new Tuple<String, Integer>(time,
-                                Integer.valueOf(data))));
+                .addElement(new DataSet<String, Integer, Integer>(Integer.valueOf(mpid),
+                        new Triple<String, Integer, Integer>(time,
+                                Integer.valueOf(noise), Integer.valueOf(dust))));
 
     }
 
@@ -50,10 +58,10 @@ public class TinnitusResource {
         int endTime = TimeUtils.incrementHoursBy(startTime, 2);
 
         Properties props = getCredentials();
-        
-        // TODO CHANGE
-        String json = new GeoJsonGenerator(props.getProperty("host"), props.getProperty("username"),
-                props.getProperty("password")).generateGeoJson(startTime, endTime);
+
+        String json = new GeoJsonGenerator(props.getProperty("host"),
+                props.getProperty("user"), props.getProperty("password"))
+                        .generateGeoJson(startTime, endTime);
 
         return Response.ok()
                 .header("Access-Control-Allow-Origin", "*")
@@ -65,11 +73,10 @@ public class TinnitusResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response installLoc(@FormParam("lat") String lat,
-            @FormParam("lng") String lng) {
-        System.out.println("fddf");
-        log.info("Received: lng=" + lng + " lat=" + lat);
+            @FormParam("lng") String lng, @FormParam("id") String id) {
+        log.info("Received: lng=" + lng + " lat=" + lat + " id="  + id);
 
-        JsonUtil.addLocation(lat, lng);
+        JsonUtil.addLocation(lat, lng, id);
 
         return Response.ok()
                 .build();
@@ -83,7 +90,7 @@ public class TinnitusResource {
                         .toAbsolutePath())) {
             props = new Properties();
             props.load(in);
-            
+
             return props;
 
         }

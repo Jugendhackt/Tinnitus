@@ -16,7 +16,7 @@ import org.jugendhackt.tinnitus.frontend.GeoJsonGenerator;
 import org.jugendhackt.tinnitus.rest.server.TinnitusServer;
 import org.jugendhackt.tinnitus.util.Cache;
 import org.jugendhackt.tinnitus.util.DataSet;
-import org.jugendhackt.tinnitus.util.Tuple;
+import org.jugendhackt.tinnitus.util.Triple;
 
 /**
  * @author Flawn
@@ -27,10 +27,7 @@ public class Main {
     private static Properties props;
 
     public static void main(String[] args) {
-//         mockCache();
-
-        System.out.println(Paths.get("influx-creds.properties")
-                .toAbsolutePath());
+//        mockCache();
 
         try (InputStream in = Files
                 .newInputStream(Paths.get("influx-creds.properties")
@@ -42,10 +39,10 @@ public class Main {
         catch (Exception e) {
             System.out.println("influx-creds.properties not found");
         }
-        
+
         GeoJsonGenerator gen = new GeoJsonGenerator(props.getProperty("host"),
                 props.getProperty("user"), props.getProperty("password"));
-        
+
         gen.generateGeoJson(1, 24);
 
         exec = Executors.newFixedThreadPool(2);
@@ -66,8 +63,8 @@ public class Main {
     private static void mockCache() {
         for (int i = 0; i < 100; i++) {
             Cache.getInstance()
-                    .addElement(new DataSet<String, Integer>(0,
-                            new Tuple("21" + i % 60, i * i + 2)));
+                    .addElement(new DataSet<String, Integer, Integer>(0,
+                            new Triple("21" + i % 60, i * i + 2, 12)));
         }
 
         System.out.println("Populated cache");

@@ -7,7 +7,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.dto.Point;
 import org.jugendhackt.tinnitus.util.Cache;
 import org.jugendhackt.tinnitus.util.DataSet;
-import org.jugendhackt.tinnitus.util.Tuple;
+import org.jugendhackt.tinnitus.util.Triple;
 
 /**
  * @author Flawn
@@ -24,18 +24,19 @@ public class DbWriterTask implements Runnable {
 
     @Override
     public void run() {
-        DataSet<String, Integer> ds = Cache.getInstance()
+        DataSet<String, Integer, Integer> ds = Cache.getInstance()
                 .getNextElement();
 
         if (ds == null) {
             return;
         }
 
-        Tuple<String, Integer> tuple = ds.getData();
+        Triple<String, Integer, Integer> triple = ds.getData();
 
         Point p = Point.measurement("noise" + ds.getMpId())
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .addField("value", tuple.getValue())
+                .addField("noise", triple.getValue1())
+                .addField("dust", triple.getValue2())
                 .build();
 
         db.write(p);

@@ -13,13 +13,13 @@ import org.jugendhackt.tinnitus.frontend.models.locations.Locations;
  * @author Flawn
  */
 public class JsonUtil {
-    public static void addLocation(String lat, String lng){
+    public static void addLocation(String lat, String lng, String id){
         try {
             System.out.println("adding");
             Locations locations = mapper.readValue(Paths.get("locations.json").toFile(), Locations.class);
 
             ArrayList<ArrayList<String>> ar = locations.getLocations();
-            ar.add(new ArrayList<String>(Arrays.asList(lat,lng)));
+            ar.add(new ArrayList<String>(Arrays.asList(lat,lng, id)));
             locations.setLocations(ar);
 
             mapper.writeValue(Files.newOutputStream(Paths.get("locations.json")), locations);

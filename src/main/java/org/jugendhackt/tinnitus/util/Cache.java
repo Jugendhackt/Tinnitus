@@ -6,40 +6,44 @@ import java.util.Collections;
 
 public class Cache {
 
-	private static Cache instance = null;
-	
-	private List<DataSet<String, Integer>> cache = Collections.synchronizedList(new ArrayList<DataSet<String, Integer>>());
+    private static Cache instance = null;
 
-	private Cache() {
+    private List<DataSet<String, Integer, Integer>> cache = Collections
+            .synchronizedList(
+                    new ArrayList<DataSet<String, Integer, Integer>>());
 
-	}
-	
-	public static synchronized Cache getInstance() {
-		if(instance != null) {
-			return instance;
-		} else {
-			instance = new Cache();
-			return instance;
-		}
-		
-	}
-	
-	public DataSet<String, Integer> getNextElement() {
-	    if(this.cache.size() > 0) {
-    	    DataSet<String, Integer> res = this.cache.get(0);
-    
-    		this.cache.remove(0);
-    
-    		Collections.rotate(cache, -1);
-    
-    		return res;
-	    } else {
-	        return null;
-	    }
-	}
-	
-    public void addElement(DataSet<String, Integer> data) {
-	    this.cache.add(data);
-	}
-	
+    private Cache() {
+
+    }
+
+    public static synchronized Cache getInstance() {
+        if (instance != null) {
+            return instance;
+        }
+        else {
+            instance = new Cache();
+            return instance;
+        }
+
+    }
+
+    public DataSet<String, Integer, Integer> getNextElement() {
+        if (this.cache.size() > 0) {
+            DataSet<String, Integer, Integer> res = this.cache.get(0);
+
+            this.cache.remove(0);
+
+            Collections.rotate(cache, -1);
+
+            return res;
+        }
+        else {
+            return null;
+        }
+    }
+
+    public void addElement(DataSet<String, Integer, Integer> data) {
+        this.cache.add(data);
+    }
+
 }

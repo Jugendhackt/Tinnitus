@@ -1,11 +1,11 @@
 package org.jugendhackt.tinnitus.util;
 
-public class DataSet<K, V> {
+public class DataSet<K, V, B> {
 
     private int mpId;
-    private Tuple<K, V> data;
+    private Triple<K, V, B> data;
 
-    public DataSet(int mpId, Tuple<K, V> data) {
+    public DataSet(int mpId, Triple<K, V, B> data) {
         this.mpId = mpId;
         this.data = data;
     }
@@ -18,11 +18,11 @@ public class DataSet<K, V> {
         this.mpId = mpId;
     }
 
-    public Tuple<K, V> getData() {
+    public Triple<K, V, B> getData() {
         return data;
     }
 
-    public void setData(Tuple<K, V> data) {
+    public void setData(Triple<K, V, B> data) {
         this.data = data;
     }
 

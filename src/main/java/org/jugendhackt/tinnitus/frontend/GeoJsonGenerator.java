@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
@@ -127,8 +128,6 @@ public class GeoJsonGenerator {
 
             QueryResult points = db.query(q);
 
-            List<Datapoint> datapoints = new ArrayList<Datapoint>();
-
             if (points.getResults()
                     .get(0)
                     .getSeries() == null) {
@@ -174,6 +173,19 @@ public class GeoJsonGenerator {
                 .getResults();
         List<String> measurements = new ArrayList<>();
 
+        if(measurementsResult.get(0).getSeries() == null) {
+            // measurement doesnt exist
+            org.influxdb.dto.Point p = org.influxdb.dto.Point.measurement("noise0")
+                    .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                    .addField("noise", 0)
+                    .addField("dust", 0)
+                    .build();
+            
+            db.write(p);
+            
+            return queryMeasurements();
+        }
+        
         for (Object obj : measurementsResult.get(0)
                 .getSeries()
                 .get(0)

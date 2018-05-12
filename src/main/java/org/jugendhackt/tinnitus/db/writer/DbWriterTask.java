@@ -24,14 +24,14 @@ public class DbWriterTask implements Runnable {
 
     @Override
     public void run() {
-        DataSet<String, Integer, Integer> ds = Cache.getInstance()
+        DataSet<String, Integer, Float> ds = Cache.getInstance()
                 .getNextElement();
 
         if (ds == null) {
             return;
         }
 
-        Triple<String, Integer, Integer> triple = ds.getData();
+        Triple<String, Integer, Float> triple = ds.getData();
 
         Point p = Point.measurement("noise" + ds.getMpId())
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)

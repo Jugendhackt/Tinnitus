@@ -8,9 +8,9 @@ public class Cache {
 
     private static Cache instance = null;
 
-    private List<DataSet<String, Integer, Integer>> cache = Collections
+    private List<DataSet<String, Integer, Float>> cache = Collections
             .synchronizedList(
-                    new ArrayList<DataSet<String, Integer, Integer>>());
+                    new ArrayList<DataSet<String, Integer, Float>>());
 
     private Cache() {
 
@@ -27,9 +27,9 @@ public class Cache {
 
     }
 
-    public DataSet<String, Integer, Integer> getNextElement() {
+    public DataSet<String, Integer, Float> getNextElement() {
         if (this.cache.size() > 0) {
-            DataSet<String, Integer, Integer> res = this.cache.get(0);
+            DataSet<String, Integer, Float> res = this.cache.get(0);
 
             this.cache.remove(0);
 
@@ -42,8 +42,8 @@ public class Cache {
         }
     }
 
-    public void addElement(DataSet<String, Integer, Integer> data) {
-        this.cache.add(data);
+    public void addElement(DataSet<String, Integer, Float> dataSet) {
+        this.cache.add(dataSet);
     }
 
 }

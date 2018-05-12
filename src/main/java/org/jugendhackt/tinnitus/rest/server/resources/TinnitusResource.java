@@ -45,9 +45,9 @@ public class TinnitusResource {
         }
         
         Cache.getInstance()
-                .addElement(new DataSet<String, Integer, Integer>(Integer.valueOf(mpid),
-                        new Triple<String, Integer, Integer>(time,
-                                Integer.valueOf(noise), Integer.valueOf(dust))));
+                .addElement(new DataSet<String, Integer, Float>(Integer.valueOf(mpid),
+                        new Triple<String, Integer, Float>(time,
+                                Integer.valueOf(noise), Float.valueOf(dust))));
 
     }
 
@@ -70,10 +70,10 @@ public class TinnitusResource {
     }
 
     @Path("/install")
-    @POST
+    @GET
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response installLoc(@FormParam("lat") String lat,
-            @FormParam("lng") String lng, @FormParam("id") String id) {
+    public Response installLoc(@QueryParam("lat") String lat,
+            @QueryParam("lng") String lng, @QueryParam("id") String id) {
         log.info("Received: lng=" + lng + " lat=" + lat + " id="  + id);
 
         JsonUtil.addLocation(lat, lng, id);

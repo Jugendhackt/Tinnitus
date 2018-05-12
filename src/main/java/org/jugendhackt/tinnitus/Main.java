@@ -63,7 +63,7 @@ public class Main {
     private static void mockCache() {
         for (int i = 0; i < 100; i++) {
             Cache.getInstance()
-                    .addElement(new DataSet<String, Integer, Integer>(0,
+                    .addElement(new DataSet<String, Integer, Float>(0,
                             new Triple("21" + i % 60, i * i + 2, 12)));
         }
 

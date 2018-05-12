@@ -11,7 +11,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.jugendhackt.tinnitus.db.DbConnector;
+import org.jugendhackt.tinnitus.db.writer.DbConnector;
+import org.jugendhackt.tinnitus.frontend.GeoJsonGenerator;
 import org.jugendhackt.tinnitus.rest.server.TinnitusServer;
 import org.jugendhackt.tinnitus.util.Cache;
 import org.jugendhackt.tinnitus.util.DataSet;
@@ -41,6 +42,11 @@ public class Main {
         catch (Exception e) {
             System.out.println("influx-creds.properties not found");
         }
+        
+        GeoJsonGenerator gen = new GeoJsonGenerator(props.getProperty("host"),
+                props.getProperty("user"), props.getProperty("password"));
+        
+        gen.generateGeoJson(1, 3);
 
         exec = Executors.newFixedThreadPool(2);
 

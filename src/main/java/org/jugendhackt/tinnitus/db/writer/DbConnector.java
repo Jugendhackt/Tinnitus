@@ -1,4 +1,4 @@
-package org.jugendhackt.tinnitus.db;
+package org.jugendhackt.tinnitus.db.writer;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;

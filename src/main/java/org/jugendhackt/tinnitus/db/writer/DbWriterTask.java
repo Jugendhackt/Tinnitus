@@ -1,4 +1,4 @@
-package org.jugendhackt.tinnitus.db;
+package org.jugendhackt.tinnitus.db.writer;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;

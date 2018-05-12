@@ -4,13 +4,15 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.jugendhackt.tinnitus.util.Cache;
 import org.jugendhackt.tinnitus.util.DataSet;
+import org.jugendhackt.tinnitus.util.TimeUtils;
 import org.jugendhackt.tinnitus.util.Tuple;
 
 @Path("/tinnitus")
@@ -32,5 +34,14 @@ public class TinnitusResource {
                         new Tuple<String, Integer>(time,
                                 Integer.valueOf(data))));
 
+    }
+    
+    @Path("/geojson")
+    @GET
+    public void geoJson(@QueryParam("stime") String stime) {
+        int startTime = Integer.parseInt(stime);
+        int endTime = TimeUtils.incrementHoursBy(startTime, 2);
+        
+        
     }
 }

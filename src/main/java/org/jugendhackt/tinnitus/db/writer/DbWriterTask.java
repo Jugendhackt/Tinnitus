@@ -34,7 +34,6 @@ public class DbWriterTask implements Runnable {
         Tuple<String, Integer> tuple = ds.getData();
 
         Point p = Point.measurement("noise" + ds.getMpId())
-                // TODO use timestamp/dateformat
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("value", tuple.getValue())
                 .build();

@@ -6,7 +6,7 @@ import org.eclipse.jetty.server.Server;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-public class TinnitusServer {
+public class TinnitusServer implements Runnable {
 
     private ResourceConfig config;
     private Server srv;
@@ -19,7 +19,7 @@ public class TinnitusServer {
                 .createServer(URI.create("http://localhost:8081"), this.config);
     }
     
-    public void start() {
+    public void run() {
         try {
             Thread.currentThread().join();
             

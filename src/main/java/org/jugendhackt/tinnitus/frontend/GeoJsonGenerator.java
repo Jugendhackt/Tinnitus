@@ -85,7 +85,7 @@ public class GeoJsonGenerator {
                     Locations.class);
             return loc.getLocations()
                     .get(id)
-                    .get(0);
+                    .get(1);
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -103,7 +103,7 @@ public class GeoJsonGenerator {
                     Locations.class);
             return loc.getLocations()
                     .get(id)
-                    .get(1);
+                    .get(0);
         }
         catch (IOException e) {
             e.printStackTrace();

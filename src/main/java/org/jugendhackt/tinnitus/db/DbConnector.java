@@ -1,4 +1,4 @@
-package org.jugendhackt.tinnitus.util.org.jugendhackt.tinnitus.db;
+package org.jugendhackt.tinnitus.db;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -6,6 +6,7 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Point;
 import org.jugendhackt.tinnitus.util.Cache;
+import org.jugendhackt.tinnitus.util.DataSet;
 import org.jugendhackt.tinnitus.util.Tuple;
 
 /**
@@ -23,6 +24,7 @@ public class DbConnector {
     }
 
     public void startConnection(){
+
         try{
             db = InfluxDBFactory.connect(host, username, password);
             db.setDatabase("Tinnitus");
@@ -34,11 +36,12 @@ public class DbConnector {
 
     }
     public void writeToDb(Tuple t){
-        Tuple<String, Integer> tuple = Cache.getInstance().getNextElement();
+        DataSet<String, Integer> ds = Cache.getInstance().getNextElement();
+        Tuple<String, Integer> tuple = ds.getData();
         db.write(Point.measurement("noise")
                 .time(Long.valueOf(tuple.getKey()), TimeUnit.MILLISECONDS)
                 .addField("db", tuple.getKey())
-                .tag("geolocation")
+                .tag("geolocation", String.valueOf(ds.getMpId()))
                 .build());
     }
 

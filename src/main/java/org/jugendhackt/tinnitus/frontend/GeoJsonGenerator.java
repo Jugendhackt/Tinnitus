@@ -1,6 +1,7 @@
 package org.jugendhackt.tinnitus.frontend;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.influxdb.InfluxDB;
@@ -25,9 +26,17 @@ public class GeoJsonGenerator {
         this.db = InfluxDBFactory.connect(host, username, password);
         this.db.setDatabase("tinnitus");
 
+        HashMap<String, Double> ultimateResult = getAverages();
+        
+        
+
+    }
+
+    private HashMap<String, Double> getAverages() {
         String queryString = "SELECT * from name WHERE time > now() - 2w";
 
         ArrayList<String> meas = (ArrayList<String>) queryMeasurements();
+        HashMap<String, Double> ultimateResult = new HashMap<String, Double>();
 
         for (int i = 0; i < meas.size(); i++) {
             Query q = new Query(queryString.replaceAll("name", meas.get(i)
@@ -43,33 +52,31 @@ public class GeoJsonGenerator {
 
             List<Datapoint> datapoints = new ArrayList<Datapoint>();
 
-            System.out.println(points.getResults());
-            
-            if(points.getResults().get(0).getSeries() == null) {
+            if (points.getResults()
+                    .get(0)
+                    .getSeries() == null) {
                 continue;
             }
-            
-            List data = points.getResults()
+
+            List<List<Object>> data = points.getResults()
                     .get(0)
                     .getSeries()
                     .get(0)
                     .getValues();
-            
+
             double sum = 0;
-            
+
             // Loop over row
-            for(int j = 0; j < data.size(); j++) {
-                sum += Double.valueOf(data.get(1).toString());
+            for (int j = 0; j < data.size(); j++) {
+                sum += Double.valueOf(data.get(j)
+                        .get(1)
+                        .toString());
             }
-            
-            System.out.println(sum / data.size());
 
-            datapoints.add(new Datapoint(data));
-
-            for(Datapoint d : datapoints) {
-                System.out.println(d.getAvg());
-            }
+            ultimateResult.put(meas.get(i), sum / data.size());
         }
+        
+        return ultimateResult;
     }
 
     private List<String> queryMeasurements() {

@@ -7,7 +7,7 @@ public class Datapoint {
     private double[] data;
     private double avg;
 
-    public Datapoint(List<List> values) {
+    public Datapoint(List<List<Object>> values) {
         data = new double[values.size()];
         for (int i = 0; i < values.size(); i++) {
             List row = values.get(i);

@@ -10,7 +10,7 @@ import org.influxdb.InfluxDBFactory;
 /**
  * @author Flawn
  */
-public class DbConnector {
+public class DbConnector implements Runnable {
     private Logger logger = Logger.getLogger(this.getClass().getName());
     private String host;
     private String username;
@@ -23,7 +23,7 @@ public class DbConnector {
         this.password = password;
     }
 
-    public void startConnection(){
+    public void run(){
         logger.info("Starting to connect to DB");
         try{
             db = InfluxDBFactory.connect(host, username, password);

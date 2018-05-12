@@ -15,7 +15,7 @@ import org.jugendhackt.tinnitus.util.DataSet;
 import org.jugendhackt.tinnitus.util.TimeUtils;
 import org.jugendhackt.tinnitus.util.Tuple;
 
-@Path("/tinnitus")
+@Path("/nw")
 public class TinnitusResource {
 
     private Logger log = Logger.getLogger(this.getClass()

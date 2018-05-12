@@ -46,7 +46,7 @@ public class Main {
         GeoJsonGenerator gen = new GeoJsonGenerator(props.getProperty("host"),
                 props.getProperty("user"), props.getProperty("password"));
         
-        gen.generateGeoJson(1, 3);
+        gen.generateGeoJson(1, 24);
 
         exec = Executors.newFixedThreadPool(2);
 

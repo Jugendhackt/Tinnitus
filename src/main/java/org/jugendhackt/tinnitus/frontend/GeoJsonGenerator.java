@@ -1,8 +1,8 @@
 package org.jugendhackt.tinnitus.frontend;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,8 +11,20 @@ import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
+import org.jugendhackt.tinnitus.frontend.models.Point;
+import org.jugendhackt.tinnitus.frontend.models.RootObject;
+import org.jugendhackt.tinnitus.frontend.models.locations.Locations;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GeoJsonGenerator {
+
+    public static ObjectMapper mapper;
+
+    static {
+        mapper = new ObjectMapper();
+    }
 
     private InfluxDB db;
     private String host;
@@ -25,11 +37,82 @@ public class GeoJsonGenerator {
         this.password = password;
     }
 
-    public void generateGeoJson(int startTime, int endTime) {
+    public String generateGeoJson(int startTime, int endTime) {
         this.db = InfluxDBFactory.connect(host, username, password);
         this.db.setDatabase("tinnitus");
 
-        HashMap<String, Double> ultimateResult = getAverages(startTime, endTime);
+        HashMap<String, Double> ultimateResult = getAverages(startTime,
+                endTime);
+
+        RootObject obj = new RootObject();
+
+        ArrayList<Point> points = new ArrayList<Point>();
+
+        for (String name : ultimateResult.keySet()) {
+            name = name.replaceAll("\\[", "");
+            name = name.replaceAll("\\]", "");
+            System.out.println(name);
+            int id = Integer.parseInt(
+                    new Character(name.charAt(name.length() - 1)).toString());
+
+            String lng = getLongitude(id);
+            String lat = getLatitude(id);
+            
+            System.out.println("Long=" + lng + " Lat=" + lat);
+
+            Point point = new Point();
+            point.setVol(Double.toString(ultimateResult.get(name)));
+            point.setLng(lng);
+            point.setLat(lat);
+
+            points.add(point);
+        }
+
+        obj.setPoints(points);
+
+        try {
+            return mapper.writeValueAsString(obj);
+        }
+        catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private String getLongitude(int id) {
+        Locations loc;
+        try {
+            loc = mapper.readValue(
+                    Files.newInputStream(Paths.get("locations.json")),
+                    Locations.class);
+            return loc.getLocations()
+                    .get(id)
+                    .get(0);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "0";
+
+    }
+
+    private String getLatitude(int id) {
+        Locations loc;
+        try {
+            loc = mapper.readValue(
+                    Files.newInputStream(Paths.get("locations.json")),
+                    Locations.class);
+            return loc.getLocations()
+                    .get(id)
+                    .get(1);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "0";
 
     }
 
@@ -65,20 +148,22 @@ public class GeoJsonGenerator {
 
             // Loop over row
             for (int j = 0; j < data.size(); j++) {
-                String str = data.get(j).get(0).toString();
-                str = str.replaceAll("T", " ").replaceAll("Z", "");
-                System.out.println(str);
+                String str = data.get(j)
+                        .get(0)
+                        .toString();
+                str = str.replaceAll("T", " ")
+                        .replaceAll("Z", "");
                 int hour = Integer.parseInt(str.split(" ")[1].split(":")[0]);
-                
-                if(hour >= startTime && hour <= endTime)
-                sum += Double.valueOf(data.get(j)
-                        .get(1)
-                        .toString());
+
+                if (hour >= startTime && hour <= endTime)
+                    sum += Double.valueOf(data.get(j)
+                            .get(1)
+                            .toString());
             }
 
             ultimateResult.put(meas.get(i), sum / data.size());
         }
-        
+
         return ultimateResult;
     }
 

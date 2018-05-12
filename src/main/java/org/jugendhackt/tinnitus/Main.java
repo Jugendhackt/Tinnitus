@@ -26,19 +26,20 @@ public class Main {
     private static Properties props;
 
     public static void main(String[] args) {
-//        mockCache();
+        // mockCache();
 
-        System.out.println(Paths.get("influx-creds.properties").toAbsolutePath());
-        
-        try (InputStream in = Files.newInputStream(
-                Paths.get("influx-creds.properties").toAbsolutePath())) {
+        System.out.println(Paths.get("influx-creds.properties")
+                .toAbsolutePath());
+
+        try (InputStream in = Files
+                .newInputStream(Paths.get("influx-creds.properties")
+                        .toAbsolutePath())) {
             props = new Properties();
             props.load(in);
 
         }
         catch (Exception e) {
-            System.out.println(
-                    "influx-creds.properties not found");
+            System.out.println("influx-creds.properties not found");
         }
 
         exec = Executors.newFixedThreadPool(2);

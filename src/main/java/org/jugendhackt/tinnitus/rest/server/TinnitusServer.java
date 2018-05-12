@@ -19,13 +19,14 @@ public class TinnitusServer implements Callable<Void> {
         this.srv = JettyHttpContainerFactory
                 .createServer(URI.create("http://localhost:8081"), this.config);
     }
-    
+
     public Void call() {
         try {
-            Thread.currentThread().join();
-                        
+            Thread.currentThread()
+                    .join();
+
             this.srv.start();
-            
+
             return null;
         }
         catch (Exception e) {

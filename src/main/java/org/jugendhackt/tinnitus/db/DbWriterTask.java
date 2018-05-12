@@ -14,31 +14,32 @@ import org.jugendhackt.tinnitus.util.Tuple;
  */
 public class DbWriterTask implements Runnable {
     private InfluxDB db;
-    
-    private Logger log = Logger.getLogger(this.getClass().getName());
+
+    private Logger log = Logger.getLogger(this.getClass()
+            .getName());
 
     public DbWriterTask(InfluxDB db) {
         this.db = db;
     }
 
     @Override
-    public void run() { 
-        DataSet<String, Integer> ds = Cache.getInstance().getNextElement();
-        
-        if(ds == null) {
+    public void run() {
+        DataSet<String, Integer> ds = Cache.getInstance()
+                .getNextElement();
+
+        if (ds == null) {
             return;
         }
-        
+
         Tuple<String, Integer> tuple = ds.getData();
-        
+
         Point p = Point.measurement("noise" + ds.getMpId())
                 // TODO use timestamp/dateformat
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("value", tuple.getValue())
                 .build();
-        
+
         db.write(p);
-        
-        
+
     }
 }

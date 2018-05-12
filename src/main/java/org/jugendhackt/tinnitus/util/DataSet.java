@@ -4,7 +4,7 @@ public class DataSet<K, V> {
 
     private int mpId;
     private Tuple<K, V> data;
-    
+
     public DataSet(int mpId, Tuple<K, V> data) {
         this.mpId = mpId;
         this.data = data;
@@ -25,5 +25,5 @@ public class DataSet<K, V> {
     public void setData(Tuple<K, V> data) {
         this.data = data;
     }
-    
+
 }

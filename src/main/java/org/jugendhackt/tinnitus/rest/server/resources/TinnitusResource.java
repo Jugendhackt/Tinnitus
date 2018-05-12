@@ -16,14 +16,17 @@ import org.jugendhackt.tinnitus.util.Tuple;
 @Path("/tinnitus")
 public class TinnitusResource {
 
-    private Logger log = Logger.getLogger(this.getClass().getName());
-    
+    private Logger log = Logger.getLogger(this.getClass()
+            .getName());
+
     @Path("/recvdata")
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void recvData(@FormParam("mpid") String mpid,
             @FormParam("time") String time, @FormParam("data") String data) {
+
         log.info("Received: MPID=" + mpid + " TIME=" + time + " DATA=" + data);
+
         Cache.getInstance()
                 .addElement(new DataSet<String, Integer>(Integer.valueOf(mpid),
                         new Tuple<String, Integer>(time,

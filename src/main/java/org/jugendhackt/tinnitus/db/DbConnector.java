@@ -13,31 +13,35 @@ import org.influxdb.InfluxDBFactory;
  * @author Flawn
  */
 public class DbConnector implements Callable<Void> {
-    private Logger logger = Logger.getLogger(this.getClass().getName());
+    private Logger logger = Logger.getLogger(this.getClass()
+            .getName());
     private String host;
     private String username;
     private String password;
     private InfluxDB db;
 
-    public DbConnector(String host, String username, String password){
+    public DbConnector(String host, String username, String password) {
         this.host = host;
         this.username = username;
         this.password = password;
     }
 
-    public Void call(){
+    public Void call() {
         logger.info("Starting to connect to DB");
-        try{
+        try {
             db = InfluxDBFactory.connect(host, username, password);
             db.setDatabase("tinnitus");
-        } catch(Exception e){
+        }
+        catch (Exception e) {
             logger.info("Connection couldn't be established!");
             logger.severe(e.getMessage());
         }
         logger.info("Connection is established!");
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(new DbWriterTask(db), 0, 10, TimeUnit.SECONDS);
-        
+        ScheduledExecutorService service = Executors
+                .newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(new DbWriterTask(db), 0, 10,
+                TimeUnit.SECONDS);
+
         return null;
     }
 

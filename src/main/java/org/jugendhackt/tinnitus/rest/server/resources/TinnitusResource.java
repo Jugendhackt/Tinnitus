@@ -63,14 +63,11 @@ public class TinnitusResource {
         int startTime = Integer.parseInt(stime);
         int endTime = TimeUtils.incrementHoursBy(startTime, 2);
 
-        log.info("Rendering JSON");
+        log.info("Rendering JSON with startTime=" + stime);
         
         Properties props = getCredentials();
 
-        String json = new GeoJsonGenerator(props.getProperty("host"),
-                props.getProperty("user"), props.getProperty("password"))
-                        .generateGeoJson(startTime);
-
+        String json = GeoJsonGenerator.getJSON(startTime);
         return Response.ok()
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(json)
@@ -83,18 +80,6 @@ public class TinnitusResource {
             @QueryParam("lng") String lng, @QueryParam("id") String id) {
         log.info("Received: lng=" + lng + " lat=" + lat + " id=" + id);
 
-//        if(Integer.parseInt(id)== -1) {
-//            FileChannel chan;
-//            try {
-//                chan = new FileOutputStream(Paths.get("locations.json").toFile(), true).getChannel();
-//                chan.truncate(0);
-//                chan.close();
-//            }
-//            catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-        
         JsonUtil.addLocation(lat, lng, id);
 
         return Response.ok()

@@ -6,10 +6,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.jugendhackt.tinnitus.db.writer.DbConnector;
 import org.jugendhackt.tinnitus.frontend.GeoJsonGenerator;
@@ -24,6 +27,7 @@ import org.jugendhackt.tinnitus.util.Triple;
 public class Main {
 
     private static ExecutorService exec;
+    private static ScheduledExecutorService jsoncache;
     private static Properties props;
 
     public static void main(String[] args) {
@@ -46,7 +50,8 @@ public class Main {
 //        gen.generateGeoJson(1, 24);
 
         exec = Executors.newFixedThreadPool(2);
-
+        new Timer().scheduleAtFixedRate(new GeoJsonGenerator(), 0, 36_000_000);
+            
         List<Callable<Void>> run = new ArrayList<Callable<Void>>();
         run.add(new TinnitusServer());
         run.add(new DbConnector(props.getProperty("host"),

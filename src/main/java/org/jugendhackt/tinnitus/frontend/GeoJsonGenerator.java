@@ -1,11 +1,14 @@
 package org.jugendhackt.tinnitus.frontend;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import org.influxdb.InfluxDB;
@@ -19,29 +22,60 @@ import org.jugendhackt.tinnitus.frontend.models.locations.Locations;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class GeoJsonGenerator {
+public class GeoJsonGenerator extends TimerTask {
 
     public static ObjectMapper mapper;
+    public static HashMap<Integer, String> cachedJSON = new HashMap<>();
+    
+    private static HashMap<String, QueryResult> results = new HashMap<>();
 
     static {
         mapper = new ObjectMapper();
     }
 
-    private InfluxDB db;
-    private String host;
-    private String username;
-    private String password;
+    private static InfluxDB db;
     private static String dbname = "tinnitus";
+    
+    private static String host = getCredentials().getProperty("host");
+    private static String username = getCredentials().getProperty("user");
+    private static String password = getCredentials().getProperty("password");
+    
+    private static Properties getCredentials() {
+        Properties props = new Properties();
 
-    public GeoJsonGenerator(String host, String username, String password) {
-        this.host = host;
-        this.username = username;
-        this.password = password;
+        try (InputStream in = Files
+                .newInputStream(Paths.get("influx-creds.properties")
+                        .toAbsolutePath())) {
+            props = new Properties();
+            props.load(in);
+
+            return props;
+
+        }
+        catch (Exception e) {
+            System.out.println("influx-creds.properties not found");
+            return null;
+        }
+    }
+    
+    public void run() {
+        System.out.println("Updating Cache...");
+        HashMap<Integer, String> updated = new HashMap<>();
+        for (int i = 0; i < 25; i = i + 2) {
+            System.out.println("Calculating time " + i + "...");
+            updated.put(i, generateGeoJson(host, username, password, i));
+        }
+        cachedJSON = updated;
+        System.out.println("Finished Updating!");
+    }
+    
+    public static String getJSON(int start) {
+        return cachedJSON.get(start);
     }
 
-    public String generateGeoJson(int startTime) {
-        this.db = InfluxDBFactory.connect(host, username, password);
-        this.db.setDatabase("tinnitus");
+    private static String generateGeoJson(String host, String username, String password, int startTime) {
+        db = InfluxDBFactory.connect(host, username, password);
+        db.setDatabase(dbname);
 
         HashMap<String, Double> ultimateResult = getAverages(startTime);
 
@@ -75,7 +109,7 @@ public class GeoJsonGenerator {
         return null;
     }
 
-    private String getLongitude(int id) {
+    private static String getLongitude(int id) {
         Locations loc;
         try {
             loc = mapper.readValue(
@@ -93,7 +127,7 @@ public class GeoJsonGenerator {
 
     }
 
-    private String getLatitude(int id) {
+    private static String getLatitude(int id) {
         Locations loc;
         try {
             loc = mapper.readValue(
@@ -111,7 +145,7 @@ public class GeoJsonGenerator {
 
     }
     
-    private HashMap<String, Double> getAverages(int startTime) {
+    private static HashMap<String, Double> getAverages(int startTime) {
         HashMap<String, Double> avgs = new HashMap<>();
         
         QueryResult measurementQuery = db.query(new Query("SHOW MEASUREMENTS", dbname));
@@ -123,7 +157,13 @@ public class GeoJsonGenerator {
         }
 
         for (String name : measurements) {
-            QueryResult points = db.query(new Query("SELECT * FROM " + name, dbname));
+            QueryResult points;
+            if (results.containsKey(name)) {
+                points  = results.get(name);
+            } else {
+                points = db.query(new Query("SELECT * FROM " + name, dbname));
+                results.put(name, points);
+            }
             Double sum = 0.0;
             int valueAmount = 0;
             List<List<Object>> allData = points.getResults().get(0).getSeries().get(0).getValues();
@@ -146,7 +186,7 @@ public class GeoJsonGenerator {
 
     }
 
-    private List<String> queryMeasurements() {
+    private static List<String> queryMeasurements() {
         QueryResult measurementQuery = db
                 .query(new Query("SHOW MEASUREMENTS", "tinnitus"));
 

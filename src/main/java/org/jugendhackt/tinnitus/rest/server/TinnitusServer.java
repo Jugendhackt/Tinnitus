@@ -5,7 +5,9 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.jetty.server.Server;
 import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.filter.EncodingFilter;
 
 public class TinnitusServer implements Callable<Void> {
 
@@ -15,7 +17,7 @@ public class TinnitusServer implements Callable<Void> {
     public TinnitusServer() {
         config = new ResourceConfig()
                 .packages("org.jugendhackt.tinnitus.rest.server.resources");
-
+        EncodingFilter.enableFor(config, GZipEncoder.class);
         this.srv = JettyHttpContainerFactory
                 .createServer(URI.create("http://localhost:8081"), this.config);
     }

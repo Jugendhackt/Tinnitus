@@ -1,6 +1,9 @@
 package org.jugendhackt.tinnitus.rest.server.resources;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -32,20 +35,23 @@ public class TinnitusResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void recvData(@FormParam("mpid") String mpid,
-            @FormParam("time") String time, @FormParam("noise") String noise, @FormParam("dust") String dust) {
-        
-        log.info("Received: MPID=" + mpid + " TIME=" + time + " DUST=" + dust + " NOISE=" + noise);
+            @FormParam("time") String time, @FormParam("noise") String noise,
+            @FormParam("dust") String dust) {
 
-        if(noise == null) {
+        log.info("Received: MPID=" + mpid + " TIME=" + time + " DUST=" + dust
+                + " NOISE=" + noise);
+
+        if (noise == null) {
             noise = "0";
         }
-        
-        if(dust == null) {
+
+        if (dust == null) {
             dust = "0";
         }
-        
+
         Cache.getInstance()
-                .addElement(new DataSet<String, Integer, Float>(Integer.valueOf(mpid),
+                .addElement(new DataSet<String, Integer, Float>(
+                        Integer.valueOf(mpid),
                         new Triple<String, Integer, Float>(time,
                                 Integer.valueOf(noise), Float.valueOf(dust))));
 
@@ -57,11 +63,13 @@ public class TinnitusResource {
         int startTime = Integer.parseInt(stime);
         int endTime = TimeUtils.incrementHoursBy(startTime, 2);
 
+        log.info("Rendering JSON");
+        
         Properties props = getCredentials();
 
         String json = new GeoJsonGenerator(props.getProperty("host"),
                 props.getProperty("user"), props.getProperty("password"))
-                        .generateGeoJson(startTime, endTime);
+                        .generateGeoJson(startTime);
 
         return Response.ok()
                 .header("Access-Control-Allow-Origin", "*")
@@ -71,11 +79,22 @@ public class TinnitusResource {
 
     @Path("/install")
     @GET
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response installLoc(@QueryParam("lat") String lat,
             @QueryParam("lng") String lng, @QueryParam("id") String id) {
-        log.info("Received: lng=" + lng + " lat=" + lat + " id="  + id);
+        log.info("Received: lng=" + lng + " lat=" + lat + " id=" + id);
 
+//        if(Integer.parseInt(id)== -1) {
+//            FileChannel chan;
+//            try {
+//                chan = new FileOutputStream(Paths.get("locations.json").toFile(), true).getChannel();
+//                chan.truncate(0);
+//                chan.close();
+//            }
+//            catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+        
         JsonUtil.addLocation(lat, lng, id);
 
         return Response.ok()

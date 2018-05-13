@@ -30,7 +30,7 @@ public class DbWriterTask implements Runnable {
         if (ds == null) {
             return;
         }
-
+        
         Triple<String, Integer, Float> triple = ds.getData();
 
         Point p = Point.measurement("noise" + ds.getMpId())
@@ -39,7 +39,7 @@ public class DbWriterTask implements Runnable {
                 .addField("dust", triple.getValue2())
                 .build();
 
-        db.write(p);
+        db.write("tinnitus", "twoweeks", p);
 
     }
 }

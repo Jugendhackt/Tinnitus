@@ -31,6 +31,7 @@ public class GeoJsonGenerator {
     private String host;
     private String username;
     private String password;
+    private static String dbname = "tinnitus";
 
     public GeoJsonGenerator(String host, String username, String password) {
         this.host = host;
@@ -38,22 +39,18 @@ public class GeoJsonGenerator {
         this.password = password;
     }
 
-    public String generateGeoJson(int startTime, int endTime) {
+    public String generateGeoJson(int startTime) {
         this.db = InfluxDBFactory.connect(host, username, password);
         this.db.setDatabase("tinnitus");
 
-        HashMap<String, Double> ultimateResult = getAverages(startTime,
-                endTime);
+        HashMap<String, Double> ultimateResult = getAverages(startTime);
 
         RootObject obj = new RootObject();
 
         ArrayList<Point> points = new ArrayList<Point>();
 
         for (String name : ultimateResult.keySet()) {
-            name = name.replaceAll("\\[", "");
-            name = name.replaceAll("\\]", "");
-            int id = Integer.parseInt(
-                    new Character(name.charAt(name.length() - 1)).toString());
+            int id = Integer.parseInt(name.substring(5));
 
             String lng = getLongitude(id);
             String lat = getLatitude(id);
@@ -113,56 +110,40 @@ public class GeoJsonGenerator {
         return "0";
 
     }
+    
+    private HashMap<String, Double> getAverages(int startTime) {
+        HashMap<String, Double> avgs = new HashMap<>();
+        
+        QueryResult measurementQuery = db.query(new Query("SHOW MEASUREMENTS", dbname));
+        List<QueryResult.Result> measurementsResult = measurementQuery.getResults();
+        List<String> measurements = new ArrayList<>();
+        for (List<Object> row : measurementsResult.get(0).getSeries().get(0).getValues()) {
+            String name = String.valueOf(row.get(0));
+            if (name.contains("noise")) measurements.add(name);
+        }
 
-    private HashMap<String, Double> getAverages(int startTime, int endTime) {
-        String queryString = "SELECT * from name WHERE time > now() - 2w";
-
-        ArrayList<String> meas = (ArrayList<String>) queryMeasurements();
-        HashMap<String, Double> ultimateResult = new HashMap<String, Double>();
-
-        for (int i = 0; i < meas.size(); i++) {
-            Query q = new Query(queryString.replaceAll("name", meas.get(i)
-                    .replaceAll("\\[", "")
-                    .replaceAll("\\]", "")), "tinnitus");
-            // List<QueryResult.Result> results = db.query(q).getResults();
-
-            QueryResult points = db.query(q);
-
-            if (points.getResults()
-                    .get(0)
-                    .getSeries() == null) {
-                continue;
-            }
-
-            List<List<Object>> data = points.getResults()
-                    .get(0)
-                    .getSeries()
-                    .get(0)
-                    .getValues();
-
-            double sum = 0;
-
-            // Loop over row
-            for (int j = 0; j < data.size(); j++) {
-                String str = data.get(j)
-                        .get(0)
+        for (String name : measurements) {
+            QueryResult points = db.query(new Query("SELECT * FROM " + name, dbname));
+            Double sum = 0.0;
+            int valueAmount = 0;
+            List<List<Object>> allData = points.getResults().get(0).getSeries().get(0).getValues();
+            for (List row : allData) {
+                String str = row.get(0)
                         .toString();
                 str = str.replaceAll("T", " ")
                         .replaceAll("Z", "");
                 int hour = Integer.parseInt(str.split(" ")[1].split(":")[0]);
-
-                if (hour >= startTime && hour <= endTime)
-                    sum += Double.valueOf(data.get(j)
-                            .get(1)
-                            .toString());
+                if (hour >= startTime && hour <= startTime + 2) {
+                    sum = sum + (double) row.get(1);
+                    valueAmount++;
+                }
+                    
             }
-
-            ultimateResult.put(meas.get(i)
-                    .replaceAll("\\[", "")
-                    .replaceAll("\\]", ""), sum / data.size());
+            Double avg = sum / (double) valueAmount;
+            avgs.put(name, avg);
         }
+        return avgs;
 
-        return ultimateResult;
     }
 
     private List<String> queryMeasurements() {
@@ -173,19 +154,20 @@ public class GeoJsonGenerator {
                 .getResults();
         List<String> measurements = new ArrayList<>();
 
-        if(measurementsResult.get(0).getSeries() == null) {
+        if (measurementsResult.get(0)
+                .getSeries() == null) {
             // measurement doesnt exist
-            org.influxdb.dto.Point p = org.influxdb.dto.Point.measurement("noise0")
+            org.influxdb.dto.Point p = org.influxdb.dto.Point
+                    .measurement("noise0")
                     .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                     .addField("noise", 0)
-                    .addField("dust", 0)
                     .build();
-            
+
             db.write(p);
-            
+
             return queryMeasurements();
         }
-        
+
         for (Object obj : measurementsResult.get(0)
                 .getSeries()
                 .get(0)

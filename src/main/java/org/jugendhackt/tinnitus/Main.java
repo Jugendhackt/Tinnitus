@@ -39,11 +39,11 @@ public class Main {
         catch (Exception e) {
             System.out.println("influx-creds.properties not found");
         }
-
-        GeoJsonGenerator gen = new GeoJsonGenerator(props.getProperty("host"),
-                props.getProperty("user"), props.getProperty("password"));
-
-        gen.generateGeoJson(1, 24);
+//
+//        GeoJsonGenerator gen = new GeoJsonGenerator(props.getProperty("host"),
+//                props.getProperty("user"), props.getProperty("password"));
+//
+//        gen.generateGeoJson(1, 24);
 
         exec = Executors.newFixedThreadPool(2);
 
@@ -54,6 +54,8 @@ public class Main {
 
         try {
             List<Future<Void>> futures = exec.invokeAll(run);
+            
+            futures.stream().allMatch(Future::isDone);
         }
         catch (InterruptedException e) {
             e.printStackTrace();
